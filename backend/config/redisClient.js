@@ -14,10 +14,10 @@ const client = createClient({
 client.on('connect', () => console.log('✅ Connected to Redis Cloud'));
 client.on('error', (err) => console.error('❌ Redis Client Error:', err.message));
 
-// Connect asynchronously
+// Connect asynchronously 
 client.connect().catch((err) => {
   console.error('❌ Failed to connect to Redis:', err.message);
 });
-
+//now export the client
 module.exports = client;
 
