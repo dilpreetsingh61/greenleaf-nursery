@@ -499,7 +499,7 @@ If you find this project helpful, please consider giving it a ⭐!
 
 <div align="center">
 
-**Made with ❤️ and 🌱 by Dilpreet Singh, Aryan Rana and Deepak Sharma**
+**Made with ❤️ and 🌱 by Dilpreet Singh, Aryan Rana, Deepak Sharma Pushpendra singh yadav**
 
 ![Plant](https://img.shields.io/badge/🪴-Plant_Lover-2d5a27?style=for-the-badge)
 
