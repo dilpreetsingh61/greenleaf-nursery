@@ -32,32 +32,32 @@ const router = express.Router();
 /**
  * Helper function to ensure contacts table exists
  */
-async function ensureContactsTableExists() {
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS contacts (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            email VARCHAR(100) NOT NULL,
-            phone VARCHAR(20),
-            subject VARCHAR(200),
-            message TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT NOW(),
-            is_read BOOLEAN DEFAULT false,
-            is_replied BOOLEAN DEFAULT false
-        );
-    `;
+// async function ensureContactsTableExists() {
+//     const createTableQuery = `
+//         CREATE TABLE IF NOT EXISTS contacts (
+//             id SERIAL PRIMARY KEY,
+//             name VARCHAR(100) NOT NULL,
+//             email VARCHAR(100) NOT NULL,
+//             phone VARCHAR(20),
+//             subject VARCHAR(200),
+//             message TEXT NOT NULL,
+//             created_at TIMESTAMP DEFAULT NOW(),
+//             is_read BOOLEAN DEFAULT false,
+//             is_replied BOOLEAN DEFAULT false
+//         );
+//     `;
     
-    try {
-        await pool.query(createTableQuery);
-        console.log('✅ Contacts table ready');
-    } catch (error) {
-        console.error('Error creating contacts table:', error);
-        throw error;
-    }
-}
+//     try {
+//         await pool.query(createTableQuery);
+//         console.log('✅ Contacts table ready');
+//     } catch (error) {
+//         console.error('Error creating contacts table:', error);
+//         throw error;
+//     }
+// }
 
-// Initialize table on module load
-ensureContactsTableExists();
+// // Initialize table on module load
+// ensureContactsTableExists();
 
 /**
  * POST /api/contact

@@ -27,27 +27,27 @@ const router = express.Router();
 /**
  * Helper function to ensure newsletter table exists
  */
-async function ensureNewsletterTableExists() {
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS newsletter (
-            id SERIAL PRIMARY KEY,
-            email VARCHAR(100) UNIQUE NOT NULL,
-            subscribed_at TIMESTAMP DEFAULT NOW(),
-            is_active BOOLEAN DEFAULT true
-        );
-    `;
+// async function ensureNewsletterTableExists() {
+//     const createTableQuery = `
+//         CREATE TABLE IF NOT EXISTS newsletter (
+//             id SERIAL PRIMARY KEY,
+//             email VARCHAR(100) UNIQUE NOT NULL,
+//             subscribed_at TIMESTAMP DEFAULT NOW(),
+//             is_active BOOLEAN DEFAULT true
+//         );
+//     `;
     
-    try {
-        await pool.query(createTableQuery);
-        console.log('✅ Newsletter table ready');
-    } catch (error) {
-        console.error('Error creating newsletter table:', error);
-        throw error;
-    }
-}
+//     try {
+//         await pool.query(createTableQuery);
+//         console.log('✅ Newsletter table ready');
+//     } catch (error) {
+//         console.error('Error creating newsletter table:', error);
+//         throw error;
+//     }
+// }
 
-// Initialize table on module load
-ensureNewsletterTableExists();
+// // Initialize table on module load
+// ensureNewsletterTableExists();
 
 /**
  * POST /api/subscribe
@@ -118,7 +118,7 @@ router.post('/',
                 }
                 
                 // Already subscribed and active
-                console.log(`ℹ️ Email already subscribed: ${email}`);
+                console.log(`ℹ Email already subscribed: ${email}`);
                 
                 return res.json({
                     success: true,
