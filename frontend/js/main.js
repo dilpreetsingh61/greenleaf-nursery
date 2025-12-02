@@ -685,6 +685,30 @@ if (document.readyState === 'loading') {
 }
 
 /**
+ * Display browser cache statistics (for demonstration)
+ */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Display cache stats after 2 seconds
+        setTimeout(() => {
+            if (window.browserCache) {
+                const stats = window.browserCache.getCacheStats();
+                if (stats) {
+                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                    console.log('📊 BROWSER CACHE STATISTICS (localStorage)');
+                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                    console.log('✅ Cache Enabled:', stats.enabled);
+                    console.log('🔍 Recent Products:', stats.recentProducts, 'items');
+                    console.log('📝 Search History:', stats.searchHistory, 'queries');
+                    console.log('🛒 Cart Backup:', stats.cartBackup);
+                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                }
+            }
+        }, 2000);
+    });
+}
+
+/**
  * Export functions for global access
  */
 window.initializeMainApp = initializeMainApp;

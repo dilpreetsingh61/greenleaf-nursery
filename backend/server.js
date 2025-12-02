@@ -1,8 +1,12 @@
 /**
  * server.js – Main Express.js Server (CE-2 PostgreSQL + MongoDB Integrated)
+ * NOW WITH HTTPS/SSL SUPPORT 🔒
  */ 
 
 const express = require("express");
+const https = require("https");
+const http = require("http");
+const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -420,24 +424,96 @@ app.use("*", (req, res) => {
 });
 app.use(errorHandler);
 
-/* -------------------- Server Startup -------------------- */
-const server = app.listen(PORT, () => {
-  console.log("\n🌱 ================================");
-  console.log("🌱 PLANT NURSERY SERVER STARTED");
-  console.log("🌱 ================================");
-  console.log(`📁 Serving static files from: ${frontendPath}`);
-  console.log(`🌱 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🌱 Server running on: http://localhost:${PORT}`);
-  console.log("✅ Connected to MongoDB");
-  console.log("✅ Connected to PostgreSQL");
-  console.log("🌱 ================================\n");
-});
+/* -------------------- Server Startup with HTTPS Support -------------------- */
+
+// SSL/HTTPS Configuration
+const USE_HTTPS = process.env.USE_HTTPS === 'true' || false;
+const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+
+let server;
+let httpsServer;
+
+if (USE_HTTPS) {
+  // Try to load SSL certificates
+  const sslKeyPath = path.join(__dirname, 'ssl', 'server.key');
+  const sslCertPath = path.join(__dirname, 'ssl', 'server.cert');
+  
+  try {
+    const sslOptions = {
+      key: fs.readFileSync(sslKeyPath),
+      cert: fs.readFileSync(sslCertPath)
+    };
+    
+    // Create HTTPS server
+    httpsServer = https.createServer(sslOptions, app);
+    
+    // Also create HTTP server that redirects to HTTPS
+    const httpApp = express();
+    httpApp.use((req, res) => {
+      res.redirect(301, `https://${req.headers.host.split(':')[0]}:${HTTPS_PORT}${req.url}`);
+    });
+    server = http.createServer(httpApp);
+    
+    server.listen(PORT, () => {
+      console.log("\n🌱 ================================");
+      console.log("🌱 PLANT NURSERY SERVER STARTED");
+      console.log("🌱 ================================");
+      console.log(`📁 Serving static files from: ${frontendPath}`);
+      console.log(`🌱 Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`🔒 HTTPS Server: https://localhost:${HTTPS_PORT}`);
+      console.log(`🔄 HTTP → HTTPS redirect: http://localhost:${PORT}`);
+      console.log("✅ Connected to MongoDB");
+      console.log("✅ Connected to PostgreSQL");
+      console.log("✅ SSL/HTTPS Enabled 🔐");
+      console.log("🌱 ================================\n");
+    });
+    
+    httpsServer.listen(HTTPS_PORT, () => {
+      console.log(`🔒 HTTPS server listening on port ${HTTPS_PORT}`);
+    });
+    
+  } catch (error) {
+    console.error("\n❌ SSL Certificate Error:", error.message);
+    console.error("💡 Run 'node ssl/generate-cert.js' to generate certificates");
+    console.error("   Or set USE_HTTPS=false in .env to disable HTTPS\n");
+    console.log("🔄 Falling back to HTTP...\n");
+    
+    // Fallback to HTTP
+    server = http.createServer(app);
+    server.listen(PORT, () => {
+      console.log("\n🌱 ================================");
+      console.log("🌱 PLANT NURSERY SERVER STARTED");
+      console.log("🌱 ================================");
+      console.log(`📁 Serving static files from: ${frontendPath}`);
+      console.log(`🌱 Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`🌱 Server running on: http://localhost:${PORT}`);
+      console.log("✅ Connected to MongoDB");
+      console.log("✅ Connected to PostgreSQL");
+      console.log("🌱 ================================\n");
+    });
+  }
+} else {
+  // Regular HTTP server
+  server = http.createServer(app);
+  server.listen(PORT, () => {
+    console.log("\n🌱 ================================");
+    console.log("🌱 PLANT NURSERY SERVER STARTED");
+    console.log("🌱 ================================");
+    console.log(`📁 Serving static files from: ${frontendPath}`);
+    console.log(`🌱 Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(`🌱 Server running on: http://localhost:${PORT}`);
+    console.log("✅ Connected to MongoDB");
+    console.log("✅ Connected to PostgreSQL");
+    console.log("💡 Set USE_HTTPS=true in .env to enable HTTPS");
+    console.log("🌱 ================================\n");
+  });
+}
 
 /* -------------------- WebSocket (Socket.io) Setup -------------------- */
 const { Server } = require('socket.io');
-const io = new Server(server, {
+const io = new Server(httpsServer || server, {
   cors: {
-    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: ["http://localhost:3000", "http://127.0.0.1:3000", "https://localhost:3443", "https://127.0.0.1:3443"],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -467,9 +543,13 @@ console.log('✅ Socket.io initialized for real-time updates\n');
 /* -------------------- Graceful Shutdown -------------------- */
 process.on("SIGINT", () => {
   console.log("\n🛑 Server stopping...");
+  if (httpsServer) httpsServer.close();
   server.close(() => process.exit(0));
 });
-process.on("SIGTERM", () => server.close(() => process.exit(0)));
+process.on("SIGTERM", () => {
+  if (httpsServer) httpsServer.close();
+  server.close(() => process.exit(0));
+});
 process.on("unhandledRejection", (reason) => {
   console.error("💥 Unhandled Rejection:", reason);
   process.exit(1);

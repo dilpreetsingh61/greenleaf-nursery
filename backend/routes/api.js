@@ -28,6 +28,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { body, query, validationResult } = require('express-validator');
 const { asyncHandler, createError } = require('../middleware/errorHandler');
+const client = require('../config/redisClient');
 
 const router = express.Router();
 
@@ -676,6 +677,107 @@ router.get('/categories', asyncHandler(async (req, res) => {
         },
         message: 'Product categories retrieved successfully'
     });
+}));
+
+/**
+ * GET /api/redis/stats
+ * Get Redis cache statistics
+ * Shows cache performance metrics and stored keys
+ */
+router.get('/redis/stats', asyncHandler(async (req, res) => {
+    try {
+        console.log('📊 Getting Redis cache statistics...');
+        
+        // Get Redis info
+        const info = await client.info('stats');
+        const dbSize = await client.dbSize();
+        
+        // Get all keys matching our pattern
+        const keys = await client.keys('/api/*');
+        
+        // Get TTL for some keys (first 5)
+        const keyDetails = await Promise.all(
+            keys.slice(0, 5).map(async (key) => {
+                const ttl = await client.ttl(key);
+                return {
+                    key: key,
+                    ttl: ttl > 0 ? `${ttl}s` : 'expired/no expiry'
+                };
+            })
+        );
+        
+        // Parse info string for useful stats
+        const infoLines = info.split('\r\n');
+        const stats = {};
+        infoLines.forEach(line => {
+            if (line.includes(':')) {
+                const [key, value] = line.split(':');
+                stats[key] = value;
+            }
+        });
+        
+        res.json({
+            success: true,
+            data: {
+                enabled: true,
+                totalKeys: dbSize,
+                cachedEndpoints: keys.length,
+                sampleKeys: keyDetails,
+                cacheHits: stats.keyspace_hits || 'N/A',
+                cacheMisses: stats.keyspace_misses || 'N/A',
+                hitRate: stats.keyspace_hits && stats.keyspace_misses 
+                    ? `${((parseInt(stats.keyspace_hits) / (parseInt(stats.keyspace_hits) + parseInt(stats.keyspace_misses))) * 100).toFixed(2)}%`
+                    : 'N/A',
+                evictedKeys: stats.evicted_keys || '0',
+                expiredKeys: stats.expired_keys || '0',
+                uptime: stats.uptime_in_seconds ? `${Math.floor(stats.uptime_in_seconds / 3600)}h` : 'N/A'
+            },
+            message: '✅ Redis cache statistics retrieved successfully'
+        });
+    } catch (error) {
+        console.error('❌ Redis stats error:', error);
+        res.json({
+            success: false,
+            data: {
+                enabled: false,
+                error: 'Redis not available or not configured'
+            },
+            message: '⚠️ Redis cache is not available'
+        });
+    }
+}));
+
+/**
+ * POST /api/redis/clear
+ * Clear Redis cache (admin function)
+ */
+router.post('/redis/clear', asyncHandler(async (req, res) => {
+    try {
+        console.log('🧹 Clearing Redis cache...');
+        
+        // Get all keys matching our pattern
+        const keys = await client.keys('/api/*');
+        
+        if (keys.length > 0) {
+            await client.del(keys);
+            console.log(`✅ Cleared ${keys.length} cached endpoints`);
+        }
+        
+        res.json({
+            success: true,
+            data: {
+                clearedKeys: keys.length
+            },
+            message: `✅ Redis cache cleared (${keys.length} keys removed)`
+        });
+    } catch (error) {
+        console.error('❌ Redis clear error:', error);
+        res.status(500).json({
+            success: false,
+            message: '❌ Failed to clear Redis cache',
+            error: error.message
+        });
+    }
 }));
 
 module.exports = router;
