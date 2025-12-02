@@ -86,6 +86,11 @@ function setupSearchFunctionality() {
 function performProductSearch(query) {
   const searchTerm = query.trim().toLowerCase();
   
+  // Cache search query to browser cache
+  if (searchTerm.length > 0 && window.browserCache) {
+    window.browserCache.addSearchQuery(searchTerm);
+  }
+  
   if (searchTerm.length === 0) {
     filteredProducts = [...sampleProducts];
   } else {

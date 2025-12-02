@@ -97,6 +97,16 @@ function initializeCart() {
 function saveCartToStorage() {
     try {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+        
+        // Also backup to browser cache manager
+        if (window.browserCache) {
+            const cartData = {
+                items: cart,
+                total: calculateCartTotal(),
+                count: cart.reduce((sum, item) => sum + item.quantity, 0)
+            };
+            window.browserCache.backupCart(cartData);
+        }
     } catch (error) {
         console.error('Error saving cart to storage:', error);
     }
