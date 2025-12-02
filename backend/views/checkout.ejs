@@ -665,7 +665,7 @@
       <p><strong>Est. Delivery:</strong> <span id="delivery-date"></span></p>
     </div>
     <div class="success-actions">
-      <a href="/" class="btn btn-secondary">Go to Home</a>
+      <a href="/products" class="btn btn-secondary">Continue Shopping</a>
     </div>
   </div>
 </div>
@@ -1079,11 +1079,6 @@ window.processPayment = function() {
       if (typeof updateCartCount === 'function') {
         updateCartCount();
       }
-      
-      // Redirect to home page after 3 seconds
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 3000);
     } else {
       throw new Error(data.error || 'Payment failed');
     }
