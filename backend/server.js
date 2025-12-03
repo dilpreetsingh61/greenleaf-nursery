@@ -111,7 +111,7 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 /* -------------------- Static + View Engine -------------------- */
-const frontendPath = path.join(__dirname, "frontend");
+const frontendPath = path.join(__dirname, "..", "frontend");
 app.use(express.static(frontendPath));
 console.log(`📁 Serving static files from: ${frontendPath}`);
 
