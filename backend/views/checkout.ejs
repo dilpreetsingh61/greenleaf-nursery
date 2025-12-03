@@ -1067,7 +1067,12 @@ window.processPayment = function() {
       
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + 7);
-      document.getElementById('delivery-date').textContent = deliveryDate.toLocaleDateString();
+      document.getElementById('delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
       
       // Show success modal
       document.getElementById('success-modal').style.display = 'flex';
@@ -1079,6 +1084,11 @@ window.processPayment = function() {
       if (typeof updateCartCount === 'function') {
         updateCartCount();
       }
+      
+      // Redirect to home page after 3 seconds
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 3000);
     } else {
       throw new Error(data.error || 'Payment failed');
     }
