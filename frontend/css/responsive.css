@@ -1041,7 +1041,7 @@
 }
 
 /* Extra Small Screens (480px and below) */
-@media (max-width: 480px) {
+@media (max-width: 520px) {
     .nav-container {
         gap: var(--spacing-sm);
     }
@@ -1090,7 +1090,7 @@
     }
     
     .products-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: var(--spacing-sm);
     }
     
