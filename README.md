@@ -22,11 +22,12 @@ GreenLeaf Nursery is a comprehensive e-commerce solution designed for online pla
 
 ### ✨ Live Demo
 
+🌐 **Live Website:** https://greenleaf-nursery-vlik.onrender.com/
+
 > 🚀 **Local Development Ready** - Clone and run with `npm run dev`
 > 
-> 🌐 **Production Deployment** - Coming soon on Railway
-
----
+> 🌐 **Production Deployed on Render**
+----
 
 ## ⚡ Quick Start
 
@@ -459,10 +460,15 @@ The project runs on `http://localhost:3000` with HTTPS disabled by default for e
 
 ### Production Deployment
 
-**Backend Options:**
-- **Railway** (Recommended) - Best for Node.js servers
-- **Render** - Free tier available
-- **Heroku** - Popular choice
+✅ **Live Deployment:**  
+The backend and frontend are successfully deployed on **Render**.  
+**Live URL:** https://greenleaf-nursery-vlik.onrender.com/
+
+**Backend Hosting:** Render  
+**Databases:** Neon PostgreSQL • MongoDB Atlas • Redis Cloud
+
+Render automatically builds and runs the Node.js server using the start script.
+
 
 > **Note:** Vercel is NOT recommended as it's designed for serverless functions, not long-running Node.js servers.
 
@@ -532,6 +538,8 @@ CREATE TABLE orders (
 ---
 
 ## 🎮 Usage
+### 🌐 Try the live website
+👉 https://greenleaf-nursery-vlik.onrender.com/
 
 ### For Users
 
