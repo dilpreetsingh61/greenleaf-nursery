@@ -208,8 +208,10 @@
       }
       
       ordersList.innerHTML = data.orders.map(order => {
-        // Parse the UTC timestamp and convert to IST
-        const orderDate = new Date(order.created_at + 'Z'); // Add Z to treat as UTC
+        // Parse the timestamp and add IST offset (5 hours 30 minutes)
+        const utcDate = new Date(order.created_at);
+        const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+        const orderDate = new Date(utcDate.getTime() + istOffset);
         const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
         const shippingInfo = typeof order.shipping_info === 'string' ? JSON.parse(order.shipping_info) : order.shipping_info;
         
@@ -219,7 +221,6 @@
               <div>
                 <div class="order-id">Order #${order.transaction_id || order.id}</div>
                 <div class="order-date">${orderDate.toLocaleString('en-IN', { 
-                  timeZone: 'Asia/Kolkata',
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric',
