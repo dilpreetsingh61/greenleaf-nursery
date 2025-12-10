@@ -42,7 +42,7 @@ router.post("/checkout", async (req, res) => {
 
     await pool.query(
       `INSERT INTO orders (user_email, user_name, order_number, transaction_id, total_amount, payment_method, payment_status, shipping_info, items, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
       [orderData.user_email, orderData.user_name, orderData.order_number, orderData.transaction_id,
        orderData.total_amount, orderData.payment_method, orderData.payment_status,
        JSON.stringify(orderData.shipping_info), JSON.stringify(orderData.items)]
